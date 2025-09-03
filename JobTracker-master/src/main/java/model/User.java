@@ -1,13 +1,31 @@
 package model;
 
+import jakarta.persistence.*;
+
+@Entity
+@Table(name = "users")  // database table name
 public class User {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)  // auto-increment primary key
     private int id;
+
+    @Column(nullable = false)
     private String name;
+
+    @Column(nullable = false, unique = true)  // email should be unique
     private String email;
+
+    @Column(nullable = false)
     private String password;
+
+    @Column(nullable = false)
     private String role;
 
-    // Constructor
+    // Default constructor (required by JPA)
+    public User() {}
+
+    // Parameterized constructor
     public User(int id, String name, String email, String password, String role) {
         this.id = id;
         this.name = name;
@@ -16,10 +34,8 @@ public class User {
         this.role = role;
     }
 
-    // Empty constructor (important for frameworks like Spring/JDBC mapping)
-    public User() {}
+    // Getters and setters
 
-    // Getters and Setters
     public int getId() {
         return id;
     }

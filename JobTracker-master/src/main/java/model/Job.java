@@ -1,16 +1,34 @@
 package model;
 
+import jakarta.persistence.*;
 import java.sql.Date;
 
+@Entity
+@Table(name = "jobs")  // Table name in the database
 public class Job {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)  // Auto increment ID
     private int id;
+
+    @Column(nullable = false)
     private String title;
+
+    @Column(length = 5000)
     private String description;
+
+    @Column(nullable = false)
     private String company;
+
+    @Column(name = "role_required", nullable = false)
     private String roleRequired;
+
+    @Column(nullable = false)
     private Date deadline;
 
-    // Constructor
+    public Job() {
+    }
+
     public Job(int id, String title, String description, String company, String roleRequired, Date deadline) {
         this.id = id;
         this.title = title;
@@ -20,7 +38,8 @@ public class Job {
         this.deadline = deadline;
     }
 
-    // Getters and Setters
+    // Getters and setters
+
     public int getId() {
         return id;
     }
