@@ -27,7 +27,7 @@ public class JobService {
     }
 
     // Search for a job by title
-    public Optional<Job> findByTitle(String title) {
+    public List<Job> findByTitle(String title) {
         // Assuming you add a method in JobRepository to find by title
         return jobRepository.findByTitleIgnoreCase(title);
     }
@@ -35,5 +35,9 @@ public class JobService {
     // Delete a job by id
     public void deleteJobById(int id) {
         jobRepository.deleteById(id);
+    }
+
+    public List<Job> findJobsByTitleIgnoreCase(String title) {
+        return jobRepository.findByTitleIgnoreCase(title);
     }
 }
