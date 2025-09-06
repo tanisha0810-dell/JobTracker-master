@@ -1,4 +1,4 @@
-package service;
+package org.example.service;
 
 import model.Application;
 import model.Job;

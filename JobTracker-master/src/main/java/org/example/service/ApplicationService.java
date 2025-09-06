@@ -1,4 +1,4 @@
-package service;
+package org.example.service;
 
 import dao.ApplicationRepository;
 import model.Application;
@@ -8,7 +8,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class ApplicationService {

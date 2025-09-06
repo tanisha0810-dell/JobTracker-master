@@ -1,4 +1,4 @@
-package service;
+package org.example.service;
 
 import dao.JobRepository;
 import model.Job;
@@ -7,7 +7,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 
 @Service

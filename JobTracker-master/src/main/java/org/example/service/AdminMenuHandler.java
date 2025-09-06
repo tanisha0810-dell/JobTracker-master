@@ -1,11 +1,10 @@
-package service;
+package org.example.service;
 
 import model.Application;
 import model.Job;
 import model.User;
 import org.springframework.stereotype.Component;
 
-import java.sql.SQLException;
 import java.util.List;
 import java.util.Scanner;
 

@@ -1,23 +1,26 @@
 package org.example;
 
-import model.Application;
-import model.Job;
 import model.User;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.ApplicationContext;
-import service.ApplicationService;
-import service.JobService;
-import service.UserService;
-import service.AdminMenuHandler;
-import service.UserMenuHandler;
+import org.example.service.ApplicationService;
+import org.example.service.JobService;
+import org.example.service.UserService;
+import org.example.service.AdminMenuHandler;
+import org.example.service.UserMenuHandler;
 
 
 import java.sql.SQLException;
-import java.util.List;
 import java.util.Scanner;
 
 @SpringBootApplication
+@ComponentScan(basePackages = {"org.example", "dao"})
+@EnableJpaRepositories(basePackages = {"dao"})
+@EntityScan(basePackages = {"model"})
 public class Main {
 
     public static void main(String[] args) {
