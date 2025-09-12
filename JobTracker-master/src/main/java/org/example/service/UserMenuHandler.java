@@ -27,6 +27,8 @@ public class UserMenuHandler {
             String registerChoice = scanner.nextLine();
 
             if (registerChoice.equalsIgnoreCase("yes")) {
+                System.out.println("Enter your email: ");
+                email = scanner.nextLine();
                 System.out.println("Enter your name: ");
                 String name = scanner.nextLine();
                 System.out.println("Create a password: ");
@@ -34,6 +36,7 @@ public class UserMenuHandler {
 
                 User newUser = new User(0, name, email, newPassword, "user");
                 userService.createUser(newUser);
+
                 System.out.println("Registration successful. Please login.");
 
                 // Restart the method after registration
