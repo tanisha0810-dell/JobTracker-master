@@ -10,5 +10,4 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @EntityScan(basePackages = "model")
 @EnableTransactionManagement
 public class DatabaseConfig {
-    // No explicit DataSource bean needed if using Spring Boot starters and application.properties config
 }

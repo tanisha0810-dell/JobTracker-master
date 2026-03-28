@@ -1,73 +1,24 @@
 package org.example;
 
-import model.User;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
-import org.springframework.context.ApplicationContext;
-import org.example.service.ApplicationService;
-import org.example.service.JobService;
-import org.example.service.UserService;
-import org.example.service.AdminMenuHandler;
-import org.example.service.UserMenuHandler;
-
-
-import java.sql.SQLException;
-import java.util.Scanner;
 
 @SpringBootApplication
-@ComponentScan(basePackages = {"org.example", "dao"})
+@ComponentScan(basePackages = {"org.example", "dao", "model", "security", "controller", "dto"})
 @EnableJpaRepositories(basePackages = {"dao"})
 @EntityScan(basePackages = {"model"})
 public class Main {
 
     public static void main(String[] args) {
-        ApplicationContext context = SpringApplication.run(Main.class, args);
-
-        ApplicationService applicationService = context.getBean(ApplicationService.class);
-        JobService jobService = context.getBean(JobService.class);
-        UserService userService = context.getBean(UserService.class);
-
-        Scanner scanner = new Scanner(System.in);
-
-        System.out.println("Do you want to login as 'user' or 'admin'?");
-        String role = scanner.nextLine().trim().toLowerCase();
-
-        try{
-            if (role.equals("admin")) {
-                int adminAttempts = 0;
-                final int MAX_ADMIN_ATTEMPTS = 3;
-
-                while (adminAttempts < MAX_ADMIN_ATTEMPTS) {
-                    System.out.println("Enter admin email: ");
-                    String email = scanner.nextLine();
-                    System.out.println("Enter admin password: ");
-                    String password = scanner.nextLine();
-
-                    if (email.equals("admin@example.com") && password.equals("admin123")) {
-                        User admin = new User(0, "Admin", email, password, "admin");
-                        System.out.println("Login successful as Admin!");
-                        AdminMenuHandler.handle(scanner, jobService, applicationService, admin);
-                        break;
-                    } else {
-                        adminAttempts++;
-                        System.out.println("Invalid admin credentials. Try again.");
-                    }
-                }
-                if (adminAttempts == MAX_ADMIN_ATTEMPTS) {
-                    System.out.println("Too many failed attempts. Exiting...");
-                    return;
-                }
-
-            } else if (role.equals("user")) {
-                UserMenuHandler.handle(scanner, userService, jobService, applicationService);
-            }
-        }catch(SQLException e){
-            System.out.println("Database error occurred: " + e.getMessage());
-            e.printStackTrace();
-        }
+        SpringApplication.run(Main.class, args);
+        System.out.println("Job Application Tracking System started...");
+        System.out.println("Use POST /auth/signup to register users.");
+        System.out.println("Use POST /auth/login to authenticate and get JWT.");
+        System.out.println("Then call protected APIs with Authorization: Bearer <token>");
     }
 }
+
 

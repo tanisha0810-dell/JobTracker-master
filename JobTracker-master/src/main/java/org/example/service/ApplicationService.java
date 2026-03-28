@@ -25,7 +25,6 @@ public class ApplicationService {
     @Autowired
     private JobRepository jobRepository;
 
-    // Save application with auto-filled details
     public Application saveApplication(Application application) {
         // Fetch user details
         Optional<User> userOpt = userRepository.findById(application.getUserId());
@@ -34,11 +33,10 @@ public class ApplicationService {
         // Fetch job details
         Optional<Job> jobOpt = jobRepository.findById(application.getJobId());
         jobOpt.ifPresent(job -> {
-            application.setJobTitle(job.getTitle());   // assuming Job has getTitle()
-            application.setCompany(job.getCompany()); // assuming Job has getCompany()
+            application.setJobTitle(job.getTitle());
+            application.setCompany(job.getCompany());
         });
 
-        // Default status if not set
         if (application.getStatus() == null) {
             application.setStatus("Applied");
         }
@@ -47,10 +45,10 @@ public class ApplicationService {
     }
 
     @Transactional
-    public void updateApplicationStatus(int userId, int jobId, String status) {
+    public void updateApplicationStatus(Long userId, Long jobId, String status) {
         List<Application> applications = repository.findByUserId(userId);
         for (Application app : applications) {
-            if (app.getJobId() == jobId) {
+            if (app.getJobId().equals(jobId)) {  // ✅ compare Longs properly
                 app.setStatus(status);
                 repository.save(app);
                 break;
@@ -58,15 +56,15 @@ public class ApplicationService {
         }
     }
 
-    public List<Application> getApplicationsByUserId(int userId) {
+    public List<Application> getApplicationsByUserId(Long userId) {
         return repository.findByUserId(userId);
     }
 
-    public List<Application> getApplicationsByJobId(int jobId) {
+    public List<Application> getApplicationsByJobId(Long jobId) {
         return repository.findByJobId(jobId);
     }
 
-    public void deleteApplication(int id) {
+    public void deleteApplication(Long id) {
         repository.deleteById(id);
     }
 }

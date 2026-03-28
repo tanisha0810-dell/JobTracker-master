@@ -34,12 +34,12 @@ public class UserMenuHandler {
                 System.out.println("Create a password: ");
                 String newPassword = scanner.nextLine();
 
-                User newUser = new User(0, name, email, newPassword, "user");
+                // ✅ Use null for auto-generated ID
+                User newUser = new User(null, name, email, newPassword, "ROLE_USER");
                 userService.createUser(newUser);
 
                 System.out.println("Registration successful. Please login.");
 
-                // Restart the method after registration
                 handle(scanner, userService, jobService, applicationService);
             } else {
                 System.out.println("Exiting ...");
@@ -62,7 +62,6 @@ public class UserMenuHandler {
 
             System.out.println("Login successful! Welcome, " + currentUser.getName());
 
-            // User menu
             while (true) {
                 System.out.println("\nUser Menu:");
                 System.out.println("1. View Available Jobs");
@@ -84,7 +83,7 @@ public class UserMenuHandler {
                         break;
                     case 2:
                         System.out.println("Enter Job ID to apply for: ");
-                        int jobId = Integer.parseInt(scanner.nextLine());
+                        Long jobId = Long.parseLong(scanner.nextLine());
 
                         Application application = new Application(
                                 currentUser.getId(),

@@ -9,8 +9,6 @@ import java.util.List;
 
 
 @Repository
-public interface JobRepository extends JpaRepository<Job, Integer> {
-    // You can add custom query methods here if needed, e.g.,
-    // List<Job> findByCompany(String company);
+public interface JobRepository extends JpaRepository<Job, Long> {
     List<Job> findByTitleIgnoreCase(String title);
 }

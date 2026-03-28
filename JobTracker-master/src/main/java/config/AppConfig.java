@@ -10,14 +10,14 @@ import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import javax.sql.DataSource;
 
 @Configuration
-@ComponentScan(basePackages = {"dao", "model", "service"}) // scan your packages
+@ComponentScan(basePackages = {"dao", "model", "service"})
 @EnableJpaRepositories(basePackages = "dao")
 @EntityScan(basePackages = "model")
 public class AppConfig {
     @Bean
     public DataSource dataSource() {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
-        dataSource.setDriverClassName("com.mysql.cj.jdbc.Driver"); // or your driver
+        dataSource.setDriverClassName("com.mysql.cj.jdbc.Driver");
         dataSource.setUrl("jdbc:mysql://localhost:3306/job_application_tracker");
         dataSource.setUsername("root");
         dataSource.setPassword("tanishA@2005");

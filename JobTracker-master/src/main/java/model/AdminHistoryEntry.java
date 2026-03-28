@@ -25,8 +25,6 @@ public class AdminHistoryEntry {
         this.status = status;
     }
 
-    // Getters/setters omitted for brevity
-
     @Override
     public String toString() {
         return "User: " + userName + ", Job: " + jobTitle + ", Company: " + companyName + ", Status: " + status;

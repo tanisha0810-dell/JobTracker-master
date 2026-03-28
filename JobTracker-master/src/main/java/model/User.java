@@ -3,30 +3,29 @@ package model;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "users")  // database table name
+@Table(name = "users")
 public class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)  // auto-increment primary key
-    private int id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @Column(nullable = false)
     private String name;
 
-    @Column(nullable = false, unique = true)  // email should be unique
-    private String email;
+    @Column(nullable = false, unique = true)
+    private String email;   // will act as username
 
     @Column(nullable = false)
     private String password;
 
+    // Default role = ROLE_USER
     @Column(nullable = false)
-    private String role;
+    private String role = "ROLE_USER";
 
-    // Default constructor (required by JPA)
     public User() {}
 
-    // Parameterized constructor
-    public User(int id, String name, String email, String password, String role) {
+    public User(Long id, String name, String email, String password, String role) {
         this.id = id;
         this.name = name;
         this.email = email;
@@ -34,42 +33,21 @@ public class User {
         this.role = role;
     }
 
-    // Getters and setters
+    // Getters & Setters
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
-    public int getId() {
-        return id;
-    }
-    public void setId(int id) {
-        this.id = id;
-    }
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
 
-    public String getName() {
-        return name;
-    }
-    public void setName(String name) {
-        this.name = name;
-    }
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
 
-    public String getEmail() {
-        return email;
-    }
-    public void setEmail(String email) {
-        this.email = email;
-    }
+    public String getPassword() { return password; }
+    public void setPassword(String password) { this.password = password; }
 
-    public String getPassword() {
-        return password;
-    }
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getRole() {
-        return role;
-    }
-    public void setRole(String role) {
-        this.role = role;
-    }
+    public String getRole() { return role; }
+    public void setRole(String role) { this.role = role; }
 
     @Override
     public String toString() {

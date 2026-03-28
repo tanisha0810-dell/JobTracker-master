@@ -8,104 +8,49 @@ public class Application {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
-
-    @Column(name = "user_id", nullable = false)
-    private int userId;
-
-    @Column(name = "job_id", nullable = false)
-    private int jobId;
-
-    @Column(name = "user_name")
-    private String userName;
+    private Long id;
 
     @Column(nullable = false)
+    private Long userId;
+
+    @Column(nullable = false)
+    private Long jobId;
+
+    private String userName;
+    private String jobTitle;
+    private String company;
     private String status;
 
-    @Column(name = "job_title")
-    private String jobTitle;
+    public Application() {}
 
-    @Column
-    private String company;
-
-    // Default constructor
-    public Application() {
-    }
-
-    // Constructor with company
-    public Application(int userId, int jobId, String jobTitle, String status, String company) {
-        this.userId = userId;
-        this.jobId = jobId;
-        this.jobTitle = jobTitle;
-        this.status = status;
-        this.company = company;
-    }
-
-    // Constructor with userName
-    public Application(int userId, int jobId, String userName, String status) {
+    public Application(Long userId, Long jobId, String userName, String status) {
         this.userId = userId;
         this.jobId = jobId;
         this.userName = userName;
         this.status = status;
     }
 
-    // Getters and setters
+    // Getters & Setters
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
-    public int getId() {
-        return id;
-    }
+    public Long getUserId() { return userId; }
+    public void setUserId(Long userId) { this.userId = userId; }
 
-    public void setId(int id) {
-        this.id = id;
-    }
+    public Long getJobId() { return jobId; }
+    public void setJobId(Long jobId) { this.jobId = jobId; }
 
-    public int getUserId() {
-        return userId;
-    }
+    public String getUserName() { return userName; }
+    public void setUserName(String userName) { this.userName = userName; }
 
-    public void setUserId(int userId) {
-        this.userId = userId;
-    }
+    public String getJobTitle() { return jobTitle; }
+    public void setJobTitle(String jobTitle) { this.jobTitle = jobTitle; }
 
-    public int getJobId() {
-        return jobId;
-    }
+    public String getCompany() { return company; }
+    public void setCompany(String company) { this.company = company; }
 
-    public void setJobId(int jobId) {
-        this.jobId = jobId;
-    }
-
-    public String getUserName() {
-        return userName;
-    }
-
-    public void setUserName(String userName) {
-        this.userName = userName;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public String getJobTitle() {
-        return jobTitle;
-    }
-
-    public void setJobTitle(String jobTitle) {
-        this.jobTitle = jobTitle;
-    }
-
-    public String getCompany() {
-        return company;
-    }
-
-    public void setCompany(String company) {
-        this.company = company;
-    }
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
 
     @Override
     public String toString() {
@@ -120,4 +65,3 @@ public class Application {
                 '}';
     }
 }
-

@@ -5,6 +5,8 @@ import model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public class UserService {
 
@@ -16,6 +18,7 @@ public class UserService {
     }
 
     public User getUserByEmail(String email) {
-        return userRepository.findByEmail(email);
+        Optional<User> userOpt = userRepository.findByEmail(email);
+        return userOpt.orElse(null);
     }
 }

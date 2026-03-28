@@ -13,7 +13,7 @@ public class AdminMenuHandler {
 
     public static void handle(Scanner scanner, JobService jobService,
                               ApplicationService applicationService, User admin) {
-        try{
+        try {
             while (true) {
                 System.out.println("\nAdmin Menu:");
                 System.out.println("1. Add a Job");
@@ -38,42 +38,46 @@ public class AdminMenuHandler {
                             System.out.println("Enter Job Deadline (yyyy-mm-dd): ");
                             String deadline = scanner.nextLine();
 
-                            Job newJob = new Job(0, title, description, company, roleRequired, java.sql.Date.valueOf(deadline));
+                            // Pass null for ID (JPA will auto-generate)
+                            Job newJob = new Job(title, description, company, roleRequired,
+                                    java.sql.Date.valueOf(deadline));
                             jobService.saveJob(newJob);
                             System.out.println("Job added successfully!");
                         } catch (Exception e) {
                             System.out.println("Error adding job: " + e.getMessage());
                         }
                         break;
+
                     case 2: // View Applied Jobs for a job
                         try {
                             System.out.println("Enter Job ID to view applied users: ");
-                            int jobId = Integer.parseInt(scanner.nextLine());
+                            Long jobId = Long.parseLong(scanner.nextLine()); // changed to Long
                             List<Application> applications = applicationService.getApplicationsByJobId(jobId);
                             if (applications.isEmpty()) {
                                 System.out.println("No applications for this job.");
                             } else {
-                                applications.forEach(app ->
-                                        System.out.println(app));
+                                applications.forEach(System.out::println);
                             }
                         } catch (Exception e) {
                             System.out.println("Error fetching applications: " + e.getMessage());
                         }
                         break;
+
                     case 3: // View All Jobs
                         try {
                             List<Job> jobs = jobService.getAllJobsSortedByTitle();
-                            jobs.forEach(job -> System.out.println(job));
+                            jobs.forEach(System.out::println);
                         } catch (Exception e) {
                             System.out.println("Error fetching jobs: " + e.getMessage());
                         }
                         break;
+
                     case 4: // Manage Job Application
                         try {
                             System.out.println("Enter User ID of applicant: ");
-                            int userId = Integer.parseInt(scanner.nextLine());
+                            Long userId = Long.parseLong(scanner.nextLine()); // changed to Long
                             System.out.println("Enter Job ID for application: ");
-                            int jobId = Integer.parseInt(scanner.nextLine());
+                            Long jobId = Long.parseLong(scanner.nextLine()); // changed to Long
                             System.out.println("Enter new status (Accepted/Rejected): ");
                             String status = scanner.nextLine();
 
@@ -83,16 +87,16 @@ public class AdminMenuHandler {
                             System.out.println("Error updating application: " + e.getMessage());
                         }
                         break;
+
                     case 5: // Exit
                         return;
+
                     default:
                         System.out.println("Invalid choice. Please try again.");
                 }
             }
-        }catch (Exception e) {
-            // log exception details
+        } catch (Exception e) {
             System.err.println("Exception: " + e.getMessage());
-            // optionally rethrow as unchecked exception
             throw new RuntimeException("Failed to update application status", e);
         }
     }
