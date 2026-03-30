@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>JobTracker</title>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+    <style>
+        :root {
+          --bg: #0a0a0f;
+          --surface: #12121a;
+          --surface2: #1c1c28;
+          --border: #2a2a3a;
+          --accent: #6c63ff;
+          --accent2: #ff6b6b;
+          --accent3: #43e97b;
+          --text: #f0f0f8;
+          --muted: #7070a0;
+          --card-shadow: 0 4px 32px rgba(108,99,255,0.08);
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+          font-family: 'DM Sans', sans-serif;
+          background: var(--bg);
+          color: var(--text);
+          min-height: 100vh;
+        }
+
+        /* AUTH */
+        #auth-screen {
+          min-height: 100vh;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background: radial-gradient(ellipse at 60% 40%, #1a1040 0%, #0a0a0f 70%);
+        }
+        .auth-box {
+          background: var(--surface);
+          border: 1px solid var(--border);
+          border-radius: 20px;
+          padding: 48px 40px;
+          width: 100%;
+          max-width: 420px;
+          box-shadow: 0 0 80px rgba(108,99,255,0.15);
+          animation: fadeUp 0.5s ease both;
+        }
+        .auth-logo {
+          font-family: 'Syne', sans-serif;
+          font-size: 28px;
+          font-weight: 800;
+          letter-spacing: -1px;
+          margin-bottom: 8px;
+          background: linear-gradient(90deg, #6c63ff, #a78bfa);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+        }
+        .auth-subtitle { color: var(--muted); font-size: 14px; margin-bottom: 32px; }
+        .tab-row { display: flex; gap: 8px; margin-bottom: 28px; }
+        .tab-btn {
+          flex: 1; padding: 10px; border: 1px solid var(--border);
+          background: transparent; color: var(--muted); border-radius: 10px;
+          font-family: 'DM Sans', sans-serif; font-size: 14px; cursor: pointer;
+          transition: all 0.2s;
+        }
+        .tab-btn.active {
+          background: var(--accent); color: #fff; border-color: var(--accent);
+        }
+        .field { margin-bottom: 16px; }
+        .field label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 6px; }
+        .field input {
+          width: 100%; padding: 12px 16px;
+          background: var(--surface2); border: 1px solid var(--border);
+          border-radius: 10px; color: var(--text); font-family: 'DM Sans', sans-serif;
+          font-size: 14px; outline: none; transition: border-color 0.2s;
+        }
+        .field input:focus { border-color: var(--accent); }
+        .btn-primary {
+          width: 100%; padding: 13px;
+          background: var(--accent); color: #fff;
+          border: none; border-radius: 10px;
+          font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700;
+          cursor: pointer; transition: opacity 0.2s, transform 0.1s;
+          margin-top: 8px;
+        }
+        .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+        .msg { font-size: 13px; margin-top: 12px; text-align: center; min-height: 18px; }
+        .msg.error { color: var(--accent2); }
+        .msg.success { color: var(--accent3); }
+
+        /* APP */
+        #app-screen { display: none; min-height: 100vh; }
+        .topbar {
+          display: flex; align-items: center; justify-content: space-between;
+          padding: 18px 32px;
+          background: var(--surface);
+          border-bottom: 1px solid var(--border);
+          position: sticky; top: 0; z-index: 100;
+        }
+        .topbar-logo {
+          font-family: 'Syne', sans-serif; font-weight: 800; font-size: 20px;
+          background: linear-gradient(90deg, #6c63ff, #a78bfa);
+          -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .nav-tabs { display: flex; gap: 4px; }
+        .nav-tab {
+          padding: 8px 18px; border-radius: 8px; border: none;
+          background: transparent; color: var(--muted);
+          font-family: 'DM Sans', sans-serif; font-size: 14px; cursor: pointer;
+          transition: all 0.2s;
+        }
+        .nav-tab.active { background: var(--surface2); color: var(--text); }
+        .nav-tab:hover { color: var(--text); }
+        .logout-btn {
+          padding: 8px 16px; border-radius: 8px;
+          border: 1px solid var(--border); background: transparent;
+          color: var(--muted); font-family: 'DM Sans', sans-serif;
+          font-size: 13px; cursor: pointer; transition: all 0.2s;
+        }
+        .logout-btn:hover { border-color: var(--accent2); color: var(--accent2); }
+
+        .page { display: none; padding: 32px; max-width: 1100px; margin: 0 auto; }
+        .page.active { display: block; animation: fadeUp 0.3s ease both; }
+
+        .page-header {
+          display: flex; align-items: center; justify-content: space-between;
+          margin-bottom: 28px;
+        }
+        .page-title {
+          font-family: 'Syne', sans-serif; font-size: 26px; font-weight: 800;
+        }
+        .page-title span { color: var(--accent); }
+
+        /* Cards grid */
+        .cards-grid {
+          display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+          gap: 18px;
+        }
+        .card {
+          background: var(--surface); border: 1px solid var(--border);
+          border-radius: 16px; padding: 24px;
+          box-shadow: var(--card-shadow);
+          transition: border-color 0.2s, transform 0.2s;
+          position: relative; overflow: hidden;
+        }
+        .card:hover { border-color: var(--accent); transform: translateY(-2px); }
+        .card::before {
+          content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+          background: linear-gradient(90deg, var(--accent), #a78bfa);
+          opacity: 0; transition: opacity 0.2s;
+        }
+        .card:hover::before { opacity: 1; }
+        .card-company {
+          font-size: 12px; color: var(--accent); font-weight: 600;
+          text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px;
+        }
+        .card-title {
+          font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 700;
+          margin-bottom: 8px;
+        }
+        .card-desc { font-size: 13px; color: var(--muted); line-height: 1.6; margin-bottom: 16px; }
+        .card-meta { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+        .badge {
+          padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600;
+          background: var(--surface2); border: 1px solid var(--border);
+          color: var(--muted);
+        }
+        .badge.deadline { color: var(--accent2); border-color: rgba(255,107,107,0.3); }
+        .badge.role { color: var(--accent3); border-color: rgba(67,233,123,0.3); }
+        .card-actions { display: flex; gap: 8px; }
+        .btn-sm {
+          padding: 8px 14px; border-radius: 8px; font-size: 13px; font-weight: 600;
+          cursor: pointer; transition: all 0.2s; font-family: 'DM Sans', sans-serif;
+          border: none;
+        }
+        .btn-apply { background: var(--accent); color: #fff; }
+        .btn-apply:hover { opacity: 0.85; }
+        .btn-delete { background: rgba(255,107,107,0.1); color: var(--accent2); border: 1px solid rgba(255,107,107,0.2); }
+        .btn-delete:hover { background: rgba(255,107,107,0.2); }
+
+        /* Add job form */
+        .add-form {
+          background: var(--surface); border: 1px solid var(--border);
+          border-radius: 16px; padding: 28px; margin-bottom: 28px;
+        }
+        .add-form h3 {
+          font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 700;
+          margin-bottom: 20px; color: var(--muted);
+        }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+        .form-grid .field { margin-bottom: 0; }
+        .form-grid .field.full { grid-column: 1/-1; }
+        .btn-add {
+          margin-top: 16px; padding: 11px 24px;
+          background: var(--accent); color: #fff;
+          border: none; border-radius: 10px;
+          font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700;
+          cursor: pointer; transition: opacity 0.2s;
+        }
+        .btn-add:hover { opacity: 0.85; }
+
+        /* Search */
+        .search-row { display: flex; gap: 10px; margin-bottom: 24px; }
+        .search-input {
+          flex: 1; padding: 11px 16px;
+          background: var(--surface); border: 1px solid var(--border);
+          border-radius: 10px; color: var(--text);
+          font-family: 'DM Sans', sans-serif; font-size: 14px; outline: none;
+          transition: border-color 0.2s;
+        }
+        .search-input:focus { border-color: var(--accent); }
+        .btn-search {
+          padding: 11px 20px; background: var(--surface2);
+          border: 1px solid var(--border); color: var(--text);
+          border-radius: 10px; cursor: pointer; font-size: 14px;
+          transition: border-color 0.2s;
+        }
+        .btn-search:hover { border-color: var(--accent); }
+
+        /* Applications */
+        .app-card {
+          background: var(--surface); border: 1px solid var(--border);
+          border-radius: 14px; padding: 20px 24px;
+          display: flex; align-items: center; justify-content: space-between;
+          margin-bottom: 12px; transition: border-color 0.2s;
+        }
+        .app-card:hover { border-color: var(--accent); }
+        .app-info h4 {
+          font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 700;
+          margin-bottom: 4px;
+        }
+        .app-info p { font-size: 13px; color: var(--muted); }
+        .status-badge {
+          padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 700;
+          text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        .status-applied { background: rgba(108,99,255,0.15); color: var(--accent); }
+        .status-interviewing { background: rgba(255,193,7,0.15); color: #ffc107; }
+        .status-rejected { background: rgba(255,107,107,0.15); color: var(--accent2); }
+        .status-accepted { background: rgba(67,233,123,0.15); color: var(--accent3); }
+
+        /* Empty state */
+        .empty {
+          text-align: center; padding: 60px 20px; color: var(--muted);
+        }
+        .empty-icon { font-size: 48px; margin-bottom: 12px; }
+        .empty p { font-size: 15px; }
+
+        /* Loading */
+        .loader {
+          text-align: center; padding: 40px; color: var(--muted); font-size: 14px;
+        }
+
+        /* Toggle add form */
+        .btn-toggle {
+          padding: 10px 20px;
+          background: var(--surface2); border: 1px solid var(--border);
+          color: var(--text); border-radius: 10px;
+          font-family: 'DM Sans', sans-serif; font-size: 14px; cursor: pointer;
+          transition: all 0.2s;
+        }
+        .btn-toggle:hover { border-color: var(--accent); color: var(--accent); }
+
+        /* Toast */
+        #toast {
+          position: fixed; bottom: 28px; right: 28px;
+          background: var(--surface2); border: 1px solid var(--border);
+          color: var(--text); padding: 14px 20px; border-radius: 12px;
+          font-size: 14px; opacity: 0; pointer-events: none;
+          transition: opacity 0.3s; z-index: 999;
+          box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+        }
+        #toast.show { opacity: 1; }
+        #toast.success { border-color: var(--accent3); color: var(--accent3); }
+        #toast.error { border-color: var(--accent2); color: var(--accent2); }
+
+        @keyframes fadeUp {
+          from { opacity: 0; transform: translateY(16px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+
+        .user-info { font-size: 13px; color: var(--muted); }
+        .user-info span { color: var(--accent); font-weight: 600; }
+
+        /* Profile page */
+        .profile-card {
+          background: var(--surface); border: 1px solid var(--border);
+          border-radius: 20px; padding: 40px; max-width: 500px;
+        }
+        .profile-avatar {
+          width: 72px; height: 72px; border-radius: 50%;
+          background: linear-gradient(135deg, var(--accent), #a78bfa);
+          display: flex; align-items: center; justify-content: center;
+          font-family: 'Syne', sans-serif; font-size: 28px; font-weight: 800;
+          color: #fff; margin-bottom: 20px;
+        }
+        .profile-name {
+          font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800;
+          margin-bottom: 4px;
+        }
+        .profile-email { color: var(--muted); font-size: 14px; margin-bottom: 24px; }
+        .stat-row { display: flex; gap: 20px; }
+        .stat {
+          background: var(--surface2); border: 1px solid var(--border);
+          border-radius: 12px; padding: 16px 24px; text-align: center;
+        }
+        .stat-num {
+          font-family: 'Syne', sans-serif; font-size: 28px; font-weight: 800;
+          color: var(--accent);
+        }
+        .stat-label { font-size: 12px; color: var(--muted); margin-top: 2px; }
+    </style>
+</head>
+<body>
+
+<!-- AUTH SCREEN -->
+<div id="auth-screen">
+    <div class="auth-box">
+        <div class="auth-logo">JobTracker</div>
+        <div class="auth-subtitle">Track your job applications effortlessly.</div>
+        <div class="tab-row">
+            <button class="tab-btn active" onclick="switchTab('login')">Login</button>
+            <button class="tab-btn" onclick="switchTab('signup')">Sign Up</button>
+        </div>
+
+        <!-- LOGIN -->
+        <div id="login-form">
+            <div class="field">
+                <label>Email</label>
+                <input type="email" id="login-email" placeholder="you@example.com"/>
+            </div>
+            <div class="field">
+                <label>Password</label>
+                <input type="password" id="login-password" placeholder="••••••••"/>
+            </div>
+            <button class="btn-primary" onclick="login()">Login →</button>
+            <div class="msg" id="login-msg"></div>
+        </div>
+
+        <!-- SIGNUP -->
+        <div id="signup-form" style="display:none">
+            <div class="field">
+                <label>Full Name</label>
+                <input type="text" id="signup-name" placeholder="Tanisha Sharma"/>
+            </div>
+            <div class="field">
+                <label>Email</label>
+                <input type="email" id="signup-email" placeholder="you@example.com"/>
+            </div>
+            <div class="field">
+                <label>Password</label>
+                <input type="password" id="signup-password" placeholder="••••••••"/>
+            </div>
+            <button class="btn-primary" onclick="signup()">Create Account →</button>
+            <div class="msg" id="signup-msg"></div>
+        </div>
+    </div>
+</div>
+
+<!-- APP SCREEN -->
+<div id="app-screen">
+    <div class="topbar">
+        <div class="topbar-logo">JobTracker</div>
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="showPage('jobs')">Jobs</button>
+            <button class="nav-tab" onclick="showPage('applications')">My Applications</button>
+            <button class="nav-tab" onclick="showPage('profile')">Profile</button>
+        </div>
+        <div style="display:flex;align-items:center;gap:16px">
+            <div class="user-info">Logged in as <span id="user-email-display"></span></div>
+            <button class="logout-btn" onclick="logout()">Logout</button>
+        </div>
+    </div>
+
+    <!-- JOBS PAGE -->
+    <div class="page active" id="page-jobs">
+        <div class="page-header">
+            <div class="page-title">Browse <span>Jobs</span></div>
+            <button class="btn-toggle" onclick="toggleAddForm()">+ Post a Job</button>
+        </div>
+
+        <div class="add-form" id="add-job-form" style="display:none">
+            <h3>Post a New Job</h3>
+            <div class="form-grid">
+                <div class="field">
+                    <label>Job Title</label>
+                    <input type="text" id="job-title" placeholder="Software Engineer"/>
+                </div>
+                <div class="field">
+                    <label>Company</label>
+                    <input type="text" id="job-company" placeholder="Google"/>
+                </div>
+                <div class="field">
+                    <label>Location</label>
+                    <input type="text" id="job-location" placeholder="Bangalore"/>
+                </div>
+                <div class="field">
+                    <label>Role Required</label>
+                    <input type="text" id="job-role" placeholder="Backend Developer"/>
+                </div>
+                <div class="field">
+                    <label>Deadline</label>
+                    <input type="date" id="job-deadline"/>
+                </div>
+                <div class="field full">
+                    <label>Description</label>
+                    <input type="text" id="job-desc" placeholder="Brief description of the role..."/>
+                </div>
+            </div>
+            <button class="btn-add" onclick="createJob()">Post Job</button>
+        </div>
+
+        <div class="search-row">
+            <input class="search-input" type="text" id="search-input" placeholder="Search jobs by title..."/>
+            <button class="btn-search" onclick="searchJobs()">Search</button>
+            <button class="btn-search" onclick="loadJobs()">Clear</button>
+        </div>
+
+        <div id="jobs-container"><div class="loader">Loading jobs...</div></div>
+    </div>
+
+    <!-- APPLICATIONS PAGE -->
+    <div class="page" id="page-applications">
+        <div class="page-header">
+            <div class="page-title">My <span>Applications</span></div>
+        </div>
+        <div id="apps-container"><div class="loader">Loading applications...</div></div>
+    </div>
+
+    <!-- PROFILE PAGE -->
+    <div class="page" id="page-profile">
+        <div class="page-header">
+            <div class="page-title">My <span>Profile</span></div>
+        </div>
+        <div class="profile-card">
+            <div class="profile-avatar" id="profile-avatar">T</div>
+            <div class="profile-name" id="profile-name">—</div>
+            <div class="profile-email" id="profile-email-text">—</div>
+            <div class="stat-row">
+                <div class="stat">
+                    <div class="stat-num" id="stat-apps">0</div>
+                    <div class="stat-label">Applications</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-num" id="stat-jobs">0</div>
+                    <div class="stat-label">Jobs Posted</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<script>
+    const API = 'http://localhost:8081';
+    let token = localStorage.getItem('jt_token') || null;
+    let userEmail = localStorage.getItem('jt_email') || null;
+    let userId = localStorage.getItem('jt_userId') || null;
+
+    // On load
+    window.onload = () => {
+      if (token) showApp();
+    };
+
+    // AUTH
+    function switchTab(tab) {
+      document.querySelectorAll('.tab-btn').forEach((b,i) => b.classList.toggle('active', (i===0&&tab==='login')||(i===1&&tab==='signup')));
+      document.getElementById('login-form').style.display = tab==='login' ? 'block' : 'none';
+      document.getElementById('signup-form').style.display = tab==='signup' ? 'block' : 'none';
+    }
+
+    async function signup() {
+      const name = document.getElementById('signup-name').value.trim();
+      const email = document.getElementById('signup-email').value.trim();
+      const password = document.getElementById('signup-password').value;
+      const msg = document.getElementById('signup-msg');
+      if (!name || !email || !password) { setMsg(msg, 'Please fill all fields.', 'error'); return; }
+      try {
+        const res = await fetch(`${API}/auth/signup`, {
+          method: 'POST', headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({name, email, password})
+        });
+        const text = await res.text();
+        if (res.ok) {
+          setMsg(msg, 'Account created! Please login.', 'success');
+          setTimeout(() => switchTab('login'), 1200);
+        } else {
+          setMsg(msg, text || 'Signup failed.', 'error');
+        }
+      } catch(e) { setMsg(msg, 'Cannot connect to server.', 'error'); }
+    }
+
+    async function login() {
+      const email = document.getElementById('login-email').value.trim();
+      const password = document.getElementById('login-password').value;
+      const msg = document.getElementById('login-msg');
+      if (!email || !password) { setMsg(msg, 'Please fill all fields.', 'error'); return; }
+      try {
+        const res = await fetch(`${API}/auth/login`, {
+          method: 'POST', headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({email, password})
+        });
+        if (res.ok) {
+          const data = await res.json();
+          token = data.token;
+          userEmail = email;
+          localStorage.setItem('jt_token', token);
+          localStorage.setItem('jt_email', email);
+          // Get userId by loading applications (we store it from first app or default to 1)
+          userId = localStorage.getItem('jt_userId') || '1';
+          showApp();
+        } else {
+          setMsg(msg, 'Invalid credentials.', 'error');
+        }
+      } catch(e) { setMsg(msg, 'Cannot connect to server.', 'error'); }
+    }
+
+    function logout() {
+      token = null; userEmail = null; userId = null;
+      localStorage.removeItem('jt_token');
+      localStorage.removeItem('jt_email');
+      localStorage.removeItem('jt_userId');
+      document.getElementById('app-screen').style.display = 'none';
+      document.getElementById('auth-screen').style.display = 'flex';
+    }
+
+    function showApp() {
+      document.getElementById('auth-screen').style.display = 'none';
+      document.getElementById('app-screen').style.display = 'block';
+      document.getElementById('user-email-display').textContent = userEmail;
+      document.getElementById('profile-email-text').textContent = userEmail;
+      document.getElementById('profile-name').textContent = userEmail.split('@')[0];
+      document.getElementById('profile-avatar').textContent = userEmail[0].toUpperCase();
+      loadJobs();
+    }
+
+    // PAGES
+    function showPage(name) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+      document.getElementById(`page-${name}`).classList.add('active');
+      event.target.classList.add('active');
+      if (name === 'applications') loadApplications();
+      if (name === 'profile') loadProfile();
+    }
+
+    function toggleAddForm() {
+      const f = document.getElementById('add-job-form');
+      f.style.display = f.style.display === 'none' ? 'block' : 'none';
+    }
+
+    // JOBS
+    async function loadJobs() {
+      document.getElementById('jobs-container').innerHTML = '<div class="loader">Loading jobs...</div>';
+      try {
+        const res = await fetch(`${API}/jobs`, { headers: authHeader() });
+        if (!res.ok) { handleUnauth(res); return; }
+        const jobs = await res.json();
+        renderJobs(jobs);
+        document.getElementById('stat-jobs').textContent = jobs.length;
+      } catch(e) {
+        document.getElementById('jobs-container').innerHTML = '<div class="empty"><div class="empty-icon">⚠️</div><p>Could not load jobs.</p></div>';
+      }
+    }
+
+    async function searchJobs() {
+      const q = document.getElementById('search-input').value.trim();
+      if (!q) { loadJobs(); return; }
+      try {
+        const res = await fetch(`${API}/jobs/search?title=${encodeURIComponent(q)}`, { headers: authHeader() });
+        if (!res.ok) { handleUnauth(res); return; }
+        const jobs = await res.json();
+        renderJobs(jobs);
+      } catch(e) { showToast('Search failed', 'error'); }
+    }
+
+    function renderJobs(jobs) {
+      const c = document.getElementById('jobs-container');
+      if (!jobs.length) {
+        c.innerHTML = '<div class="empty"><div class="empty-icon">💼</div><p>No jobs found.</p></div>';
+        return;
+      }
+      c.innerHTML = `<div class="cards-grid">${jobs.map(j => `
+        <div class="card">
+          <div class="card-company">${j.company || 'Company'}</div>
+          <div class="card-title">${j.title}</div>
+          <div class="card-desc">${j.description || 'No description provided.'}</div>
+          <div class="card-meta">
+            ${j.roleRequired ? `<span class="badge role">${j.roleRequired}</span>` : ''}
+            ${j.deadline ? `<span class="badge deadline">📅 ${j.deadline}</span>` : ''}
+            ${j.location ? `<span class="badge">📍 ${j.location}</span>` : ''}
+          </div>
+          <div class="card-actions">
+            <button class="btn-sm btn-apply" onclick="applyJob(${j.id}, '${j.title}')">Apply</button>
+            <button class="btn-sm btn-delete" onclick="deleteJob(${j.id})">Delete</button>
+          </div>
+        </div>
+      `).join('')}</div>`;
+    }
+
+    async function createJob() {
+      const body = {
+        title: document.getElementById('job-title').value.trim(),
+        company: document.getElementById('job-company').value.trim(),
+        location: document.getElementById('job-location').value.trim(),
+        roleRequired: document.getElementById('job-role').value.trim(),
+        deadline: document.getElementById('job-deadline').value,
+        description: document.getElementById('job-desc').value.trim(),
+      };
+      if (!body.title || !body.company || !body.deadline) {
+        showToast('Title, company and deadline are required.', 'error'); return;
+      }
+      try {
+        const res = await fetch(`${API}/jobs`, {
+          method: 'POST', headers: {'Content-Type':'application/json', ...authHeader()},
+          body: JSON.stringify(body)
+        });
+        if (res.ok) {
+          showToast('Job posted successfully!', 'success');
+          toggleAddForm();
+          loadJobs();
+          ['job-title','job-company','job-location','job-role','job-deadline','job-desc'].forEach(id => document.getElementById(id).value = '');
+        } else { handleUnauth(res); showToast('Failed to post job.', 'error'); }
+      } catch(e) { showToast('Error posting job.', 'error'); }
+    }
+
+    async function deleteJob(id) {
+      if (!confirm('Delete this job?')) return;
+      try {
+        const res = await fetch(`${API}/jobs/${id}`, { method: 'DELETE', headers: authHeader() });
+        if (res.ok) { showToast('Job deleted.', 'success'); loadJobs(); }
+        else { handleUnauth(res); }
+      } catch(e) { showToast('Error deleting job.', 'error'); }
+    }
+
+    // APPLICATIONS
+    async function applyJob(jobId, jobTitle) {
+      const uid = userId || '1';
+      try {
+        const res = await fetch(`${API}/applications`, {
+          method: 'POST',
+          headers: {'Content-Type':'application/json', ...authHeader()},
+          body: JSON.stringify({ userId: parseInt(uid), jobId: jobId })
+        });
+        if (res.ok) { showToast(`Applied for ${jobTitle}!`, 'success'); }
+        else { showToast('Could not apply. Already applied?', 'error'); }
+      } catch(e) { showToast('Error applying.', 'error'); }
+    }
+
+    async function loadApplications() {
+      document.getElementById('apps-container').innerHTML = '<div class="loader">Loading applications...</div>';
+      const uid = userId || '1';
+      try {
+        const res = await fetch(`${API}/applications/user/${uid}`, { headers: authHeader() });
+        if (!res.ok) { handleUnauth(res); return; }
+        const apps = await res.json();
+        renderApplications(apps);
+        document.getElementById('stat-apps').textContent = apps.length;
+      } catch(e) {
+        document.getElementById('apps-container').innerHTML = '<div class="empty"><div class="empty-icon">⚠️</div><p>Could not load applications.</p></div>';
+      }
+    }
+
+    function renderApplications(apps) {
+      const c = document.getElementById('apps-container');
+      if (!apps.length) {
+        c.innerHTML = '<div class="empty"><div class="empty-icon">📋</div><p>No applications yet. Browse jobs and apply!</p></div>';
+        return;
+      }
+      c.innerHTML = apps.map(a => `
+        <div class="app-card">
+          <div class="app-info">
+            <h4>${a.jobTitle || 'Job #' + a.jobId}</h4>
+            <p>${a.company || ''} ${a.company ? '·' : ''} Applied as ${a.userName || 'User'}</p>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px">
+            <span class="status-badge status-${(a.status||'applied').toLowerCase()}">${a.status || 'Applied'}</span>
+            <button class="btn-sm btn-delete" onclick="deleteApp(${a.id})">✕</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    async function deleteApp(id) {
+      try {
+        const res = await fetch(`${API}/applications/${id}`, { method: 'DELETE', headers: authHeader() });
+        if (res.ok) { showToast('Application removed.', 'success'); loadApplications(); }
+      } catch(e) { showToast('Error.', 'error'); }
+    }
+
+    async function loadProfile() {
+      const uid = userId || '1';
+      try {
+        const [appsRes, jobsRes] = await Promise.all([
+          fetch(`${API}/applications/user/${uid}`, { headers: authHeader() }),
+          fetch(`${API}/jobs`, { headers: authHeader() })
+        ]);
+        if (appsRes.ok) { const a = await appsRes.json(); document.getElementById('stat-apps').textContent = a.length; }
+        if (jobsRes.ok) { const j = await jobsRes.json(); document.getElementById('stat-jobs').textContent = j.length; }
+      } catch(e) {}
+    }
+
+    // UTILS
+    function authHeader() { return { 'Authorization': `Bearer ${token}` }; }
+
+    function handleUnauth(res) {
+      if (res.status === 403 || res.status === 401) {
+        showToast('Session expired. Please login again.', 'error');
+        setTimeout(logout, 1500);
+      }
+    }
+
+    function setMsg(el, text, type) {
+      el.textContent = text;
+      el.className = `msg ${type}`;
+    }
+
+    function showToast(msg, type='success') {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.className = `show ${type}`;
+      setTimeout(() => t.className = '', 3000);
+    }
+</script>
+</body>
+</html>
